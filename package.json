@@ -1,0 +1,24 @@
+{
+	"name ": "passport-token-validator",
+	"version": "0.0.1",
+	"description": "Passport strategy to validate access tokens/refresh tokens and establish a user session accordingly",
+	"main": "strategy.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "ikhnaton <ikhnaton@techie.com>",
+	"license": "ISC",
+	"dependencies": {
+		"body-parser": "^1.17.1",
+		"cookie-parser": "^1.4.3",
+		"express": "^4.15.2",
+		"express-session": "^1.15.2",
+		"jsonwebtoken": "^7.4.1",
+		"lodash": "^4.17.4",
+		"passport": "^0.3.2",
+		"query-string": "^4.3.4"
+	},
+	"engines": {
+		"node": ">=7.0.0"
+	}
+}
