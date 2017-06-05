@@ -125,10 +125,9 @@ TokenValidatorStrategy.prototype.authenticate = function(req, myOptions) {
 						}
 						self.success({ "id": data.sub, "_json": userObj });
 					}
-					else
+					else if (refreshToken)
 					{
-						console.log(data);
-						self.fail();
+						self._checkRefreshToken(refreshToken, req);
 					}
 				})
 				.catch((error) => {
@@ -138,99 +137,108 @@ TokenValidatorStrategy.prototype.authenticate = function(req, myOptions) {
 	}
 	else if (refreshToken)
 	{
-		let p = new Promise((resolve, reject) => {
-
-			let postData = {
-				refresh_token: refreshToken,
-				client_id: opts.clientID,
-				client_secret: opts.clientSecret,
-				grant_type: "refresh_token"
-			};
-
-			let postDataStr = queryString.stringify(postData);
-			opts.url = url.parse(opts.tokenURL);
-
-			let options = {
-				host: opts.url.hostname,
-				path: opts.url.pathname,
-				port: 443,
-				method: 'POST',
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded",
-					"Content-Length": postDataStr.length
-				}
-			};
-
-			let callback = function (response) {
-				let str = '';
-				response.on('data', function (chunk) {
-					str += chunk;
-				});
-
-				response.on('end', function () {
-					console.log(str);
-					str = JSON.parse(str);
-
-					if (str.error)
-					{
-						console.log("error: ", str.error);
-						console.log("msg: ", str.error_description);
-						self.fail();
-						reject(str);
-					}
-					else
-					{
-						self._checkAccessToken(str.access_token)
-							.then((data) => {
-								if ((data.active == true) || (data.active == "true"))
-								{
-									let userObj = {
-														"userid": data.sub,
-														"expiration": data.exp,
-														"access_token": str.access_token,
-														"refresh_token": str.refresh_token
-													};
-									req.res.cookie('x-access-token', str.access_token);
-									req.res.cookie('x-refresh-token', str.refresh_token);
-									self.success({ "id": data.sub, "_json": userObj });
-									resolve(userObj);
-								}
-								else
-								{
-									reject(data);
-								}
-							})
-							.catch((error) => {
-								console.log(error);
-								self.fail();
-								reject(error);
-							});
-
-					}
-				});
-			};
-
-			let request = https.request(options, callback);
-
-			request.on('error', function (error) {
-				console.log(error);
-				self.fail();
-				reject(error);
-			});
-
-			request.write(postDataStr);
-
-			request.end();
-
-		});
-
-		return p;
+		self._checkRefreshToken(refreshToken, req);
 	}
 	else
 	{
 		self.fail();
 	}
 };
+
+TokenValidatorStrategy.prototype._checkRefreshToken = function(refreshToken, req)
+{
+	let self = this;
+
+//	let p = new Promise((resolve, reject) => {
+
+		let postData = {
+			refresh_token: refreshToken,
+			client_id: opts.clientID,
+			client_secret: opts.clientSecret,
+			grant_type: "refresh_token"
+		};
+
+		let postDataStr = queryString.stringify(postData);
+		opts.url = url.parse(opts.tokenURL);
+
+		let options = {
+			host: opts.url.hostname,
+			path: opts.url.pathname,
+			port: 443,
+			method: 'POST',
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Content-Length": postDataStr.length
+			}
+		};
+
+		let callback = function (response) {
+			let str = '';
+			response.on('data', function (chunk) {
+				str += chunk;
+			});
+
+			response.on('end', function () {
+//				console.log(str);
+				str = JSON.parse(str);
+
+				if (str.error)
+				{
+					console.log("error: ", str.error);
+					console.log("msg: ", str.error_description);
+					self.fail();
+//					reject(str);
+				}
+				else
+				{
+					self._checkAccessToken(str.access_token)
+						.then((data) => {
+							if ((data.active == true) || (data.active == "true"))
+							{
+								let userObj = {
+													"userid": data.sub,
+													"expiration": data.exp,
+													"access_token": str.access_token,
+													"refresh_token": str.refresh_token
+												};
+								req.res.cookie('x-access-token', str.access_token);
+								req.res.cookie('x-refresh-token', str.refresh_token);
+								self.success({ "id": data.sub, "_json": userObj });
+//								resolve(userObj);
+							}
+							else
+							{
+								console.log(data);
+								self.fail();
+//								reject(data);
+							}
+						})
+						.catch((error) => {
+							console.log(error);
+							self.fail();
+//							reject(error);
+						});
+
+				}
+			});
+		};
+
+		let request = https.request(options, callback);
+
+		request.on('error', function (error) {
+			console.log(error);
+			self.fail();
+//			reject(error);
+		});
+
+		request.write(postDataStr);
+
+		request.end();
+
+//	});
+
+//	return p;
+}
 
 TokenValidatorStrategy.prototype._checkAccessToken = function(accessToken)
 {
