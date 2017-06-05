@@ -1,6 +1,6 @@
 {
 	"name": "passport-token-validator",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Passport strategy to validate access tokens/refresh tokens and establish a user session accordingly",
 	"main": "strategy.js",
 	"scripts": {

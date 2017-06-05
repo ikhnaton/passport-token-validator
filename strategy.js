@@ -226,6 +226,10 @@ TokenValidatorStrategy.prototype.authenticate = function(req, myOptions) {
 
 		return p;
 	}
+	else
+	{
+		self.fail();
+	}
 };
 
 TokenValidatorStrategy.prototype._checkAccessToken = function(accessToken)
