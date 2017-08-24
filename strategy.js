@@ -30,8 +30,18 @@ TokenValidatorStrategy.prototype.authenticate = function(req, myOptions) {
 	var self = this;
 
 //	let code = req.query.code;
+	let authToken = req.headers['authorization'];
+	if ((authToken != null) && (authToken != ""))
+	{
+		if (authToken.substring(0,6).toLocaleLowerCase() == "bearer")
+		{
+			authToken = authToken.slice(6).trim();
+		}
+	}
+
 	let accessToken = req.cookies["x-access-token"];
 	let refreshToken = req.cookies["x-refresh-token"];
+	if (((accessToken == null) || (accessToken == "")) && ((authToken != null) || (authToken != ""))) accessToken = authToken;
 
 	/* purposely don't process code */
 //	if (code)
