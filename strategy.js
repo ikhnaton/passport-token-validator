@@ -190,7 +190,15 @@ TokenValidatorStrategy.prototype._checkRefreshToken = function(refreshToken, req
 
 			response.on('end', function () {
 //				console.log(str);
-				str = JSON.parse(str);
+				try
+				{
+					str = JSON.parse(str);
+				}
+				catch (error)
+				{
+					reject(error);
+					return;
+				}
 
 				if (str.error)
 				{
@@ -286,8 +294,15 @@ TokenValidatorStrategy.prototype._checkAccessToken = function(accessToken)
 				});
 
 				response.on('end', function () {
-					str = JSON.parse(str);
-					resolve(str);
+					try
+					{
+						str = JSON.parse(str);
+						resolve(str);
+					}
+					catch (error)
+					{
+						reject(error);
+					}
 				});
 			}
 
