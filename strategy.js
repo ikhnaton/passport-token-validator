@@ -196,7 +196,8 @@ TokenValidatorStrategy.prototype._checkRefreshToken = function(refreshToken, req
 				}
 				catch (error)
 				{
-					reject(error);
+//					reject(error);
+					self.fail();
 					return;
 				}
 
