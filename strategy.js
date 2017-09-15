@@ -33,7 +33,7 @@ TokenValidatorStrategy.prototype.authenticate = function(req, myOptions) {
 	let authToken = req.headers['authorization'];
 	if ((authToken != null) && (authToken != ""))
 	{
-		if (authToken.substring(0,6).toLocaleLowerCase() == "bearer")
+		if (authToken.substring(0,6).toLowerCase() == "bearer")
 		{
 			authToken = authToken.slice(6).trim();
 		}
@@ -138,6 +138,10 @@ TokenValidatorStrategy.prototype.authenticate = function(req, myOptions) {
 					else if (refreshToken)
 					{
 						self._checkRefreshToken(refreshToken, req);
+					}
+					else
+					{
+						self.fail();
 					}
 				})
 				.catch((error) => {
